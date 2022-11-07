@@ -61,6 +61,8 @@ IMDB_wiki_data.rename(columns={'revenue.value': 'Movie box office revenue', 'fre
 df_movie = df_movie.set_index('Freebase movie ID').combine_first(IMDB_wiki_data.set_index('Freebase movie ID')[['Movie release date', 'Movie box office revenue']]).reset_index()
 # remove non-originally-CMU rows
 df_movie = df_movie.loc[df_movie['Movie name'].notna()]
+# remove movie duplicated by the combination
+df_movie = df_movie[~df_movie['Freebase movie ID'].duplicated(keep='first')]
 
 # transfer movie names, release dates and box office revenue from CMU dataset to IMDB_wiki
 IMDB_wiki_data = IMDB_wiki_data.set_index('Freebase movie ID').combine_first(df_movie.set_index('Freebase movie ID')[['Movie name', 'Movie release date', 'Movie box office revenue']]).reset_index()
