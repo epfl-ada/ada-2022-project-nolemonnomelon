@@ -13,6 +13,7 @@ Perform a temporal analysis of the changes of the popular movie genres.
 
 Proposed additional datasets
 -	IMBD: https://datasets.imdbws.com/
+- Inflation data: https://data.worldbank.org/indicator/FP.CPI.TOTL.ZG
 -	Wikipedia …
 -	
 Methods
