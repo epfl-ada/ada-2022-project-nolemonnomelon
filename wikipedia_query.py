@@ -9,12 +9,13 @@ sparql = SPARQLWrapper("https://query.wikidata.org/sparql")
 
 # create query
 sparql.setQuery("""
-SELECT ?film ?filmLabel ?imdb_id ?revenue ?freebaseID
+SELECT ?film ?filmLabel ?imdb_id ?revenue ?freebaseID ?budget
 WHERE
 {
     ?film wdt:P31 wd:Q11424 .
     ?film wdt:P345 ?imdb_id .
     OPTIONAL {?film wdt:P2142 ?revenue .}
+    OPTIONAL {?film wdt:P2130 ?budget .}
     OPTIONAL {?film wdt:P646 ?freebaseID .}
 
     SERVICE wikibase:label { bd:serviceParam wikibase:language "en" }
@@ -26,7 +27,7 @@ WHERE
 sparql.setReturnFormat(JSON)
 results = sparql.query().convert()
 wiki = pd.json_normalize(results['results']['bindings'])
-wiki = wiki[['filmLabel.value', 'freebaseID.value', 'imdb_id.value', 'revenue.value']]
+wiki = wiki[['filmLabel.value', 'freebaseID.value', 'imdb_id.value', 'revenue.value', 'budget.value']]
 
 # queries have duplicates because box office revenue is sometimes
 # calculated for different countries
