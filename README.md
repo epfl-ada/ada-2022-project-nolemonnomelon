@@ -4,7 +4,7 @@ ___Study of the evolution of movie success across time___
 
 ## Abstract
 
-We may think that a successful movie is defined by its revenue, the higher the income and the better the film. In this project, we want to go way beyond the mere revenue information. We are going to exploit the rating of movies as well as the inflation, to determine whether there is a temporal link between how much people seem to love a film and how much the film is actually earning. At this point we must not forget that the budget of a movie can impact it's success, it may be a link between the budget, the revenue and the rating. Once we have a better understanding of this mechanism, we would like to find which are the most successful movie genres in each of the 20th century decades. We may detect the golden age of the Far West and Science Fiction movies and it would be interesting to analyse how fast movie preferences change with time.
+<p align="justify"> We may think that a successful movie is defined by its revenue, the higher the income and the better the film. In this project, we want to go way beyond the mere revenue information. We are going to exploit the rating of movies as well as the inflation, to determine whether there is a temporal link between how much people seem to love a film and how much the film is actually earning. At this point we must not forget that the budget of a movie can impact it's success, it may be a link between the budget, the revenue and the rating. Once we have a better understanding of this mechanism, we would like to find which are the most successful movie genres in each of the 20th century decades. We may detect the golden age of the Far West and Science Fiction movies and it would be interesting to analyse how fast movie preferences change with time.</p>
 
 ## Research Questions
 
@@ -15,7 +15,7 @@ Perform a temporal analysis of the changes of the popular movie genres.
 3) How fast do popular movie genres change across time?
 
 ## Proposed additional datasets
-The CMU movie metadata contains not many and not recent movies (until 2012 only). Moreover, it has a lot of NA values, espcially for the box office revenue. So, we decided to complete this dataset in order to have a more representative one.We use :
+<p align="justify"> The CMU movie metadata contains not many and not recent movies (until 2012 only). Moreover, it has a lot of NA values, espcially for the box office revenue. So, we decided to complete this dataset in order to have a more representative one. We use : </p>
 
 *	[IMBD](https://datasets.imdbws.com/): dataset to complete the amount of movies of the original [CMU](http://www.cs.cmu.edu/~ark/personas/) and ensure good representation of their variety.
 *	[Wikipedia](https://www.wikipedia.org/): with the help of [`wikipedia_query.py`](https://github.com/epfl-ada/ada-2022-project-nolemonnomelon/blob/main/wikipedia_query.py)we request imdb-associated films on wikipedia, with associated box office revenues and freebase IDs if available (on wikipedia). With the freebase IDs we will be able to associate this data with the CMU movie metadata.
