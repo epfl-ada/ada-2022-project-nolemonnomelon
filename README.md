@@ -26,7 +26,17 @@ All the details about the final dataset creation are available in the notebook [
 
 ## Methods
 
-The first step is to pre-process the data. ADD WHAT IS DONE?
+**Step 1: Dataset construction and pre-processing.**
+
+* CMU exploration.
+* Final dataset creation.
+
+**Step 2: Preliminary analysis and visualizations.**
+
+* Graphical representations of revenue, budget and rating.
+* Pearson correlation coefficient evaluation.
+
+**Step 3: Blabla.**
 
 ## Proposed timeline
 
