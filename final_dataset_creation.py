@@ -4,6 +4,7 @@
 
 import pandas as pd
 import numpy as np
+from helpers import transform_into_list
 
 # import dataset and query
 big_data = pd.read_csv('Expanded_data/big_data.tsv', sep='\t')
@@ -29,15 +30,6 @@ big_data['Movie release date'] = pd.to_datetime(big_data['Movie release date'], 
 big_data.replace('\\N', float('NaN'), inplace=True)
 
 # As the Movie genres are string, we transform it into list of strings
-def transform_into_list(text) :
-    ''' This function take a string and transform it into list of strings'''
-    if isinstance(text, str) :
-        if text != '[]' :
-            text = text[1:-1]
-            text = text.replace("'", "")
-            return list(subString for subString in text.split(', '))
-    else :
-        return float('NaN')   
 big_data['Movie genres names'] = big_data['Movie genres names'].apply(lambda s : transform_into_list(s)) 
 
 # Replace the \\N by NaN

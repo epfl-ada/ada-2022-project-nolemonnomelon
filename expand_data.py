@@ -1,5 +1,7 @@
 ##################################################################
-# 
+# This script brings together IMDB data with associated wikipedia data 
+# and notably box office values from the CMU dataset to create a big 
+# representative movie dataset, used for large-scale analysis.
 ##################################################################
 
 import pandas as pd
