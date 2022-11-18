@@ -4,7 +4,7 @@ ___Study of the evolution of movie success across time___
 
 ## Abstract
 
-<p align="justify"> In the late 19th century the entertainment industry saw the advent of the first films. In the past hundred years movies have become an integral part of the lives of people around the globe. Nowadays, the movie industry has seen the advent of "superproductions" supported by insane amounts of money. However, budget might not be the only predictor of movie quality, appreciation and revenue. We aim to study the relationship between movie rating, revenue, and budget throughout the last 60 years. In addition, we want to include movie genres in our model, and hope to reveal a time-dependent effect of trends in the movie industry. This would be signalled by an increased revenue due only to genre differences, changing across decades. Lastly, we are interested in low budget movies with high revenue and ratings. We want to investigate possible common characteristics of these movies and how they evolve with time. </p>
+<p align="justify"> In the late 19th century the entertainment industry saw the advent of the first films. In the past hundred years movies have become an integral part of the lives of people around the globe. Nowadays, the movie industry has seen the advent of "superproductions" supported by insane amounts of money. However, budget might not be a mandatory prerequisite for movie quality, appreciation and revenue. We aim to study the relationship between movie rating, revenue, and budget throughout the last 60 years. In addition, we want to include movie genres in our analysis, and hope to reveal a time-dependent effect of trends in the movie industry. This would be signalled by an increased revenue/rating due only to genre differences, changing across decades. Lastly, we are interested in low budget movies with high revenue and ratings. We want to investigate possible common characteristics of these movies and how they evolve with time. </p>
 
 
 
@@ -17,12 +17,13 @@ Perform a temporal analysis of the changes of the popular movie genres.
 3) Can we find a cluster of good movies that have a low budget ? If yes, which percentage ? Which are the common features across them ?
 
 ## Proposed additional datasets
-<p align="justify"> The CMU movie metadata contains not many and not recent movies (until 2012 only). Moreover, it has a lot of NA values, espcially for the box office revenue. So, we decided to complete this dataset in order to have a more representative one. We use : </p>
+<p align="justify"> The CMU movie metadata contains not many and not recent movies (until 2012 only). Moreover, it has a lot of NA values, espcially for the box office revenue. Therefore, we decided to complete this dataset in order to have a more representative one. We use : </p>
 
 *	[IMDB](https://datasets.imdbws.com/): dataset to complete the amount of movies of the original [CMU](http://www.cs.cmu.edu/~ark/personas/) and ensure good representation of their variety.
 *	[Wikipedia](https://www.wikipedia.org/): with the help of [`wikipedia_query.py`](https://github.com/epfl-ada/ada-2022-project-nolemonnomelon/blob/main/wikipedia_query.py)we request imdb-associated films on wikipedia, with associated box office revenues and freebase IDs if available (on wikipedia). With the freebase IDs we will be able to associate this data with the CMU movie metadata.
 *	[TMDB](https://developers.themoviedb.org/3/getting-started/introduction): [`TMDB_query.py`](https://github.com/epfl-ada/ada-2022-project-nolemonnomelon/blob/main/TMDB_query.py) uses the imdb ids and freebase ids to query movie budgets and country of origin production from the TMDB dataset.
-* [Inflation data](https://data.worldbank.org/indicator/FP.CPI.TOTL.ZG): dataset containing inflation coefficient of each country from 1960 to 2021. This dataset is useful when we want to correct the movie box office revenue and the movie budget. Since the two are in US dollar we use the USA inflation as reference of all the movies. In addition, we converted all the values keeping as reference the year 2021. All of this is taking into account by [`final_dataset_creation.py`](https://github.com/epfl-ada/ada-2022-project-nolemonnomelon/blob/main/final_dataset_creation.py).
+* [Inflation data](https://data.worldbank.org/indicator/FP.CPI.TOTL.ZG): dataset containing inflation coefficient of each country from 1960 to 2021. This dataset is useful when we want to correct the movie box office revenue and the movie budget. Since the two are in US dollar we use the USA inflation as reference of all the movies. In addition, we converted all the values keeping as reference the year 2021.
+All of this is taken into account by [`final_dataset_creation.py`](https://github.com/epfl-ada/ada-2022-project-nolemonnomelon/blob/main/final_dataset_creation.py).
 
 All the details about the final dataset creation are available in the notebook [`dataset_creation.ipynb`](https://github.com/epfl-ada/ada-2022-project-nolemonnomelon/blob/main/dataset_creation.ipynb).
 
@@ -53,7 +54,7 @@ All the details about the final dataset creation are available in the notebook [
 * Discussion.
 * Conclusion.
 
-**Step 5: Code optimization.**
+**Step 6: Code optimization.**
 
 ## Proposed timeline
 
