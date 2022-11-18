@@ -1,6 +1,4 @@
-# How to make a good movie without money
-
-___Study of the evolution of movie success across time___
+# How to make a good movie without money?
 
 ## Abstract
 
