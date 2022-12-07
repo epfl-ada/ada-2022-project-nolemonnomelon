@@ -39,7 +39,7 @@ All the details about the final dataset creation are available in the notebook [
 * Graphical representations of revenue, budget and rating.
 * Pearson correlation coefficient evaluation.
 
-**Step 3: Genre analysis.**
+**Step 3: Genre analysis.** [`Genre.ipynb`](https://github.com/epfl-ada/ada-2022-project-nolemonnomelon/blob/main/Genre.ipynb)
 
 * Graphical representations, correlation with revenue, budget and rating.
 * Regression with selected features.  
