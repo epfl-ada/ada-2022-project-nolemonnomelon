@@ -7,7 +7,7 @@ import pandas as pd
 import json
 
 # Import idx corresponding to known box office revenue
-big_data = pd.read_csv('Expanded_data/big_data.tsv', sep='\t')
+big_data = pd.read_csv('../Expanded_data/big_data.tsv', sep='\t')
 revenue_idx = big_data['Movie box office revenue'].dropna().index.values
 # Some revenue are only identified by IMDB or freebase id, so we take both
 IMDB_id = big_data['IMDB_id'].iloc[revenue_idx]
@@ -85,4 +85,4 @@ for i, (imdb_id, freebase_id) in enumerate(zip(IMDB_id, FREEBASE_id)):
 print(len(IMDB_id), len(FREEBASE_id), len(budget), len(prod_country))
 d = {'IMDB_id' : IMDB_id, 'Freebase_id' : FREEBASE_id, 'budget' : budget, 'prod_country' : prod_country}
 TMDB_df = pd.DataFrame(data=d)
-TMDB_df.to_csv('Expanded_data/TMDB_query.tsv', sep='\t', index = False)
+TMDB_df.to_csv('../Expanded_data/TMDB_query.tsv', sep='\t', index = False)
