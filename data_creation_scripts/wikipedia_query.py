@@ -35,4 +35,4 @@ wiki = wiki[['filmLabel.value', 'freebaseID.value', 'imdb_id.value', 'revenue.va
 wiki = wiki[~wiki['imdb_id.value'].duplicated(keep='first')]
 
 # Save wikipedia query
-wiki.to_csv('../data/Expanded_data/wikipedia_query.tsv', sep='\t', index=False)
+wiki.to_csv('data/Expanded_data/wikipedia_query.tsv', sep='\t', index=False)
