@@ -167,7 +167,7 @@ def plot_double_CIs(CIs_t1, CIs_t2, params, xlabel=None, figsize=(10,8), n = Non
         axs[n].set_yticks(range(len(params)), params);
         axs[n].set_xlabel(xlabel)
         axs[n].set_title('95% confidence intervals')
-        plt.legend([l1, l2], ['old', 'recent'])
+        axs[n].legend([l1, l2], ['old', 'recent'])
 
 
 ###################
