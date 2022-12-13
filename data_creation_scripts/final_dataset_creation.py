@@ -10,8 +10,8 @@ sys.path.append('../')
 from helpers import transform_into_list
 
 # import dataset and query
-big_data = pd.read_csv('../Expanded_data/big_data.tsv', sep='\t')
-TMDB = pd.read_csv('../Expanded_data/TMDB_query.tsv', sep='\t')
+big_data = pd.read_csv('../data/Expanded_data/big_data.tsv', sep='\t')
+TMDB = pd.read_csv('../vExpanded_data/TMDB_query.tsv', sep='\t')
 
 # localize elements to merge by imdb or freebase id
 imdb_idx = TMDB['IMDB_id'].dropna().index.values
@@ -48,7 +48,7 @@ big_data['Movie genres names'] = big_data['Movie genres names'].apply(lambda x :
 
 ################################ INFLATION ##########################################
 # Inflation per country from 1960 to 2021
-df_inflation = pd.read_csv("../Inflation_data/inflation.csv",header=2)
+df_inflation = pd.read_csv("../data/Inflation_data/inflation.csv", header=2)
 df_inflation = df_inflation.iloc[:,0:-1]
 
 # Inflation in the USA from 1960 to 2021 as the revenue and budget are calculated in US dollars
@@ -78,4 +78,4 @@ big_data["inflation corrected budget"] = big_data['budget'] * big_data["Movie re
 
 ################################ SAVE DATA ##########################################
 # Save expanded IMDB_wiki
-big_data.to_csv('../Expanded_data/big_data_final.tsv', sep='\t', index = False)
+big_data.to_csv('../data/Expanded_data/big_data_final.tsv', sep='\t', index = False)

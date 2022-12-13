@@ -7,13 +7,13 @@
 import pandas as pd
 
 # Load IMDB ratings
-IMDB_data = pd.read_csv("../IMDB_data/title.ratings.tsv", sep='\t')
+IMDB_data = pd.read_csv("../data/IMDB_data/title.ratings.tsv", sep='\t')
 
 # Load IMDB "US" versions of titles
-IMDB_akas = (pd.read_csv("../IMDB_data/title.akas.tsv", sep='\t',
+IMDB_akas = (pd.read_csv("../data/IMDB_data/title.akas.tsv", sep='\t',
                      usecols=['titleId', 'title', 'region'])[lambda x: x['region'] == 'US'])
 # Load year of release
-IMDB_basics = (pd.read_csv("../IMDB_data/title.basics.tsv", sep='\t',
+IMDB_basics = (pd.read_csv("../data/IMDB_data/title.basics.tsv", sep='\t',
                       usecols=['tconst', 'startYear', 'genres', 'titleType'])[lambda x: x['titleType'] == 'movie'])
 
 # Use key to merge IMDB movie titles and ratings
@@ -34,7 +34,7 @@ def list_genres(s) :
 IMDB_data['genres'] = IMDB_data['genres'].apply(lambda x : list_genres(x))
 
 # MERGE wikidata with IMDB;
-wiki = pd.read_csv('../Expanded_data/wikipedia_query.tsv', sep='\t')
+wiki = pd.read_csv('../data/Expanded_data/wikipedia_query.tsv', sep='\t')
 IMDB_wiki_data = IMDB_data.join(wiki.set_index('imdb_id.value')[['revenue.value', 'freebaseID.value']], how='left').reset_index()
 
 # assert there is 1 row per imdb identifier for security
@@ -49,7 +49,8 @@ assert IMDB_wiki_data.index.duplicated().sum() == 0, "IMDB_wiki contains duplica
 columns_movie = ['Wikipedia movie ID', 'Freebase movie ID', 'Movie name', 'Movie release date', 'Movie box office revenue',
                  'Movie runtime', 'Movie languages (Freebase ID:name tuples)', 'Movie countries (Freebase ID:name tuples)',
                  'Movie genres (Freebase ID:name tuples)']
-df_movie = pd.read_csv("../MovieSummaries/movie.metadata.tsv",sep='\t', names=columns_movie)
+df_movie = pd.read_csv(
+    "../data/MovieSummaries/movie.metadata.tsv", sep='\t', names=columns_movie)
 
 # rename columns for correspondance between dataframes
 IMDB_wiki_data.rename(columns={'index' : 'IMDB_id', 'revenue.value': 'Movie box office revenue',
@@ -68,4 +69,4 @@ cols = ['IMDB_id', 'Freebase movie ID', 'Movie name',
 IMDB_wiki_data = IMDB_wiki_data[cols]
 
 # Save expanded IMDB_wiki
-IMDB_wiki_data.to_csv('../Expanded_data/big_data.tsv', sep='\t', index = False)
+IMDB_wiki_data.to_csv('../data/Expanded_data/big_data.tsv', sep='\t', index = False)

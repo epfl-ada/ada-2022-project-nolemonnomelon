@@ -1,5 +1,5 @@
-/IMDB_data/
+/data/IMDB_data/
 /.idea
-Expanded_data/big_data.tsv
-Expanded_data/big_data_final.tsv
-Expanded_data/mid2name.tsv
+data/Expanded_data/big_data.tsv
+data/Expanded_data/big_data_final.tsv
+data/Expanded_data/mid2name.tsv
