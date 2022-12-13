@@ -116,35 +116,58 @@ def barplot(res, figsize=(5,7)) :
     plt.show()
 
     
-def plot_double_CIs(CIs_t1, CIs_t2, params, xlabel=None, figsize=(10,8)):
+def plot_double_CIs(CIs_t1, CIs_t2, params, xlabel=None, figsize=(10,8), n = None, fig=None, axs=None):
     # function to plot confidence intervals
     # adapted code from solutions of tutorial 4
+    if n == None:
+        # create figure
+        plt.figure(figsize=figsize)
 
-    # create figure
-    plt.figure(figsize=figsize)
+        # Compute interval center and half interval length for plotting for t1
+        means = np.array([CI[0] for CI in CIs_t1])
+        one_sided_CI = np.array([(CI[2] - CI[1]) / 2 for CI in CIs_t1])
 
-    # Compute interval center and half interval length for plotting for t1
-    means = np.array([CI[0] for CI in CIs_t1])
-    one_sided_CI = np.array([(CI[2] - CI[1]) / 2 for CI in CIs_t1])
-
-    # plot CIs
-    l1 = plt.errorbar(means, np.array(range(len(means))) + 0.2, xerr=one_sided_CI, linewidth=1,
+        # plot CIs
+        l1 = plt.errorbar(means, np.array(range(len(means))) + 0.2, xerr=one_sided_CI, linewidth=1,
                  linestyle='none', marker='o', markersize=3,
                  markerfacecolor='black', markeredgecolor='black', capsize=5)
 
-    # Compute interval center and half interval length for plotting for t2
-    means = np.array([CI[0] for CI in CIs_t2])
-    one_sided_CI = np.array([(CI[2] - CI[1]) / 2 for CI in CIs_t2])
+        # Compute interval center and half interval length for plotting for t2
+        means = np.array([CI[0] for CI in CIs_t2])
+        one_sided_CI = np.array([(CI[2] - CI[1]) / 2 for CI in CIs_t2])
 
-    # plot CIs
-    l2 = plt.errorbar(means, np.array(range(len(means))) - 0.1, xerr=one_sided_CI, linewidth=1,
+        # plot CIs
+        l2 = plt.errorbar(means, np.array(range(len(means))) - 0.1, xerr=one_sided_CI, linewidth=1,
                  linestyle='none', marker='o', markersize=3,
                  markerfacecolor='black', markeredgecolor='black', capsize=5)
     
-    plt.yticks(range(len(params)), params);
-    plt.xlabel(xlabel)
-    plt.title('95% confidence intervals')
-    plt.legend([l1, l2], ['old', 'recent'])
+        plt.yticks(range(len(params)), params);
+        plt.xlabel(xlabel)
+        plt.title('95% confidence intervals')
+        plt.legend([l1, l2], ['old', 'recent'])
+    if n != None:
+        # Compute interval center and half interval length for plotting for t1
+        means = np.array([CI[0] for CI in CIs_t1])
+        one_sided_CI = np.array([(CI[2] - CI[1]) / 2 for CI in CIs_t1])
+
+        # plot CIs
+        l1 = axs[n].errorbar(means, np.array(range(len(means))) + 0.2, xerr=one_sided_CI, linewidth=1,
+                 linestyle='none', marker='o', markersize=3,
+                 markerfacecolor='black', markeredgecolor='black', capsize=5)
+
+        # Compute interval center and half interval length for plotting for t2
+        means = np.array([CI[0] for CI in CIs_t2])
+        one_sided_CI = np.array([(CI[2] - CI[1]) / 2 for CI in CIs_t2])
+
+        # plot CIs
+        l2 = axs[n].errorbar(means, np.array(range(len(means))) - 0.1, xerr=one_sided_CI, linewidth=1,
+                 linestyle='none', marker='o', markersize=3,
+                 markerfacecolor='black', markeredgecolor='black', capsize=5)
+    
+        axs[n].set_yticks(range(len(params)), params);
+        axs[n].set_xlabel(xlabel)
+        axs[n].set_title('95% confidence intervals')
+        plt.legend([l1, l2], ['old', 'recent'])
 
 
 ###################
