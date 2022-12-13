@@ -2,7 +2,6 @@
 # This script contains some helper functions
 ##################################################################
 
-
 import pandas as pd
 import numpy as np
 import ast
@@ -10,6 +9,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import plotly.express as px
 from scipy.stats import pearsonr
+
 
 def transform_into_list(text) :
     ''' This function take a string and transform it into list of strings'''
@@ -274,7 +274,7 @@ def plot_mean_median(input_mean_median, ylabel, filename = None, save=False):
     plt.show()
 
 
-def reg_coef(x, y, label=None, color=None, **kwargs):
+def reg_coef(x, y):
     ax = plt.gca()
     r, p = pearsonr(x, y)
     ax.annotate('r = {:.2f}'.format(r), xy=(0.5, 0.6),
