@@ -187,16 +187,13 @@ def year_distribution(data, title, filename = None, save=False):
     df_column.dropna(subset=['Movie release date'], inplace=True)
     count = df_column['Movie release date'].value_counts()
     # plt.figure(figsize=(20,8))
-    df = pd.DataFrame({'Year': count.index.astype(
-        'int64'), 'Movie count': count.values})
+    df = pd.DataFrame({'Year': count.index.astype('int64'), 'Movie count': count.values})
     fig = px.bar(df, x='Year', y='Movie count',
                  color='Movie count', title=title)
     fig.update_layout(title_x=0.5)
     if save:
         fig.write_html(f"outputs/{filename}.html")
     fig.show('jupyterlab')
-
-# Plotting
 
 
 def plot_RRB_distr(dist, log=[False, False], xlim=True, title = 'Histrogram distribution', filename = None, save=False):
