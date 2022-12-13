@@ -274,7 +274,7 @@ def plot_mean_median(input_mean_median, ylabel, filename = None, save=False):
     plt.show()
 
 
-def reg_coef(x, y):
+def reg_coef(x, y, color = None, label = None):
     ax = plt.gca()
     r, p = pearsonr(x, y)
     ax.annotate('r = {:.2f}'.format(r), xy=(0.5, 0.6),
