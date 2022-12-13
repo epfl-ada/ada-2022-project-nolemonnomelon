@@ -72,16 +72,10 @@ def difference_in_usage(data_, g, CI_list, measure) :
 
 
 def hist_subplots(data, measure, genre_names, subtitle, xlabel, xlim, ylim):
-    fig, axs = plt.subplots(6,4, constrained_layout=True, figsize=(20, 20))
+    fig, axs = plt.subplots(5,4, constrained_layout=True, figsize=(20, 20))
     fig.suptitle(subtitle)
 
-    axs[0,0].hist(data[measure], density=True)
-    axs[0,0].set_title('All genres')
-    axs[0,0].set_xlim(xlim)
-    axs[0,0].set_ylim(ylim)
-    axs[0,0].set(xlabel=xlabel, ylabel='Density')
     for i, g in enumerate(genre_names):
-        i = i+1
         ax = axs[int(i/4),i%4]
         ax.hist(data[data[g]==1][measure], density=True)
         ax.set_title(g)
