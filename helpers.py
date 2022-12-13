@@ -193,7 +193,7 @@ def year_distribution(data, title, filename = None, save=False):
     fig.update_layout(title_x=0.5)
     if save:
         fig.write_html(f"outputs/{filename}.html")
-    fig.show('jupyterlab')
+    fig.show('png')
 
 
 def plot_RRB_distr(dist, log=[False, False], xlim=True, title = 'Histrogram distribution', filename = None, save=False):
