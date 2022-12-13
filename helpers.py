@@ -9,7 +9,6 @@ import ast
 import matplotlib.pyplot as plt
 import seaborn as sns
 import plotly.express as px
-from scipy import stats
 from scipy.stats import pearsonr
 
 def transform_into_list(text) :
@@ -262,7 +261,7 @@ def reg_coef(x, y, label=None, color=None, **kwargs):
     ax.set_axis_off()
 
 
-def scattering(data, Type = None, color = None, filename = None, save = False):
+def scattering(data, Type = None, color = None, add_kde = False, filename = None, save = False):
     if Type != 'All data':
         g = sns.PairGrid(data.loc[data['Type'] ==
                      Type], hue='Type', palette=[color])
@@ -270,6 +269,8 @@ def scattering(data, Type = None, color = None, filename = None, save = False):
         g = sns.PairGrid(data)
     g.map_diag(sns.histplot, kde=True)
     g.map_lower(sns.regplot)
+    if add_kde:
+        g.map_lower(sns.kdeplot, color = 'red')
     g.map_upper(reg_coef)
     g.fig.suptitle(Type)
     if save:
