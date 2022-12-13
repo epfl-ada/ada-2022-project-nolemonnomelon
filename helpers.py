@@ -57,6 +57,32 @@ def bootstrap(data, n_it):
     return [np.nanmean(means), np.nanpercentile(means, 2.5),np.nanpercentile(means, 97.5)]
 
 
+def difference_in_usage(data_, g, CI_list, measure) :
+    #difference returns -1 (absent for winner and present for the loser), 0 (present or absent in both), or 1 (present for the winner and absent for looser). 
+    d = data_[data_[g]==1][measure]
+    b = bootstrap(d, 1000)
+    CI_list.append(b)
+
+
+def hist_subplots(data, measure, genre_names, subtitle, xlabel, xlim, ylim):
+    fig, axs = plt.subplots(6,4, constrained_layout=True, figsize=(20, 20))
+    fig.suptitle(subtitle)
+
+    axs[0,0].hist(data[measure], density=True)
+    axs[0,0].set_title('All genres')
+    axs[0,0].set_xlim(xlim)
+    axs[0,0].set_ylim(ylim)
+    axs[0,0].set(xlabel=xlabel, ylabel='Density')
+    for i, g in enumerate(genre_names):
+        i = i+1
+        ax = axs[int(i/4),i%4]
+        ax.hist(data[data[g]==1][measure], density=True)
+        ax.set_title(g)
+        ax.set_xlim(xlim)
+        ax.set_ylim(ylim)
+        ax.set(xlabel=xlabel, ylabel='Density')
+
+
 def plot_CIs(CIs, params, xlabel=None):
     ''' Function to plot confidence intervals adapted code from solutions of tutorial 4 '''
 
@@ -73,6 +99,19 @@ def plot_CIs(CIs, params, xlabel=None):
     plt.yticks(range(len(params)), params);
     plt.xlabel(xlabel)
     plt.title('95% confidence intervals')
+    plt.show()
+
+
+def barplot(res, figsize=(5,7)) :
+    ''' Barplot of the coefficients of the linear regression sorted by value'''
+    tmp = []
+    for name, value in zip(res.params.index, res.params):
+        tmp.append({"name": name, "value": value})
+
+    features_coef = pd.DataFrame(tmp).sort_values("value")
+
+    plt.subplots(figsize=figsize)
+    plt.barh(features_coef.name, features_coef.value, alpha=0.6)
     plt.show()
 
     
