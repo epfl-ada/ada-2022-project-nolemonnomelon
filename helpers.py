@@ -9,6 +9,8 @@ import ast
 import matplotlib.pyplot as plt
 import seaborn as sns
 import plotly.express as px
+from scipy import stats
+from scipy.stats import pearsonr
 
 def transform_into_list(text) :
     ''' This function take a string and transform it into list of strings'''
@@ -43,19 +45,24 @@ def incorporate_genre_dummies(data):
     return data, genre_names
 
 
-def bootstrap(data, n_it):
-    '''Bootstrap to get the 95% CI'''
+# Create the bootstrap function
+def bootstrap(data, n_it, also_median = False):
     means = np.zeros(n_it)
     data = np.array(data)
+    if also_median:
+        medians = np.zeros(n_it)
     
     for n in range(n_it):
         indices = np.random.randint(0, len(data), len(data))
         data_new = data[indices] 
         means[n] = np.nanmean(data_new)
-    
-    # 95% CI -> 2.5% and 97.5%
-    return [np.nanmean(means), np.nanpercentile(means, 2.5),np.nanpercentile(means, 97.5)]
+        if also_median:
+            medians[n] = np.nanmedian(data_new)
 
+    if also_median:
+        return [np.nanmean(means), np.nanmedian(medians), np.nanpercentile(means, 2.5),np.nanpercentile(means, 97.5), np.nanpercentile(medians, 2.5),np.nanpercentile(medians, 97.5)]
+    else:
+        return [np.nanmean(means), np.nanpercentile(means, 2.5),np.nanpercentile(means, 97.5)]
 
 def difference_in_usage(data_, g, CI_list, measure) :
     #difference returns -1 (absent for winner and present for the loser), 0 (present or absent in both), or 1 (present for the winner and absent for looser). 
@@ -207,6 +214,27 @@ def plot_RRB_distr(dist, log=[False, False], xlim=True, title = 'Histrogram dist
         plt.savefig(f'outputs/{filename}.png')
     plt.show()
 
+def plot_RRB_across_time(years, mean, median, low, high, low_median, high_median, filename = None, save = False):
+    fig, ax = plt.subplots(3,1,figsize=(16,10),sharex=True)
+
+    for i in range(3):
+        ax[i].fill_between(years, low[i,:],high[i,:], alpha = 0.2, color = 'blue')
+        l0, = ax[i].plot(years,mean[i,:], color = 'blue')
+
+        ax[i].fill_between(years, low_median[i,:],high_median[i,:], alpha = 0.2, color = 'orange')
+        l1, = ax[i].plot(years,median[i,:], color = 'orange')
+        if i !=2 :
+            ax[i].set_yscale('log')
+
+    ax[0].set_ylabel('Revenue')
+    ax[1].set_ylabel('Budget')
+    ax[2].set_ylabel('Rating')
+    plt.xlabel('Year')
+    plt.suptitle('Mean and median of revenue, budget, rating from 1959 to 2021')
+    fig.legend([l0,l1], ['Mean', 'Median'])
+    if save:
+        plt.savefig(f'outputs/{filename}.png')
+    plt.show()
 
 def plot_mean_median(input_mean_median, ylabel, filename = None, save=False):
     fig, ax = plt.subplots(2, 1, figsize=(16, 10), sharey=True)
@@ -245,7 +273,7 @@ def reg_coef(x, y, label=None, color=None, **kwargs):
 
 def scattering(data, Type = None, color = None, filename = None, save = False):
     if Type != 'All data':
-        g = sns.PairGrid(data.loc[df_pdataair['Type'] ==
+        g = sns.PairGrid(data.loc[data['Type'] ==
                      Type], hue='Type', palette=[color])
     else:
         g = sns.PairGrid(data)
