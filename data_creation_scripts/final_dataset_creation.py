@@ -10,7 +10,15 @@ print(os.getcwd())
 import sys
 sys.path.append('../')
 
-from helpers import transform_into_list
+def transform_into_list(text) :
+    ''' This function take a string and transform it into list of strings'''
+    if isinstance(text, str) :
+        if text != '[]' :
+            text = text[1:-1]
+            text = text.replace("'", "")
+            return list(subString for subString in text.split(', '))
+    else :
+        return float('NaN')   
 
 # import dataset and query
 big_data = pd.read_csv('data/Expanded_data/big_data.tsv', sep='\t')

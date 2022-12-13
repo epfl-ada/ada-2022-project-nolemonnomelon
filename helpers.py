@@ -11,17 +11,6 @@ import plotly.express as px
 from scipy.stats import pearsonr
 
 
-def transform_into_list(text) :
-    ''' This function take a string and transform it into list of strings'''
-    if isinstance(text, str) :
-        if text != '[]' :
-            text = text[1:-1]
-            text = text.replace("'", "")
-            return list(subString for subString in text.split(', '))
-    else :
-        return float('NaN')   
-    
-
 def incorporate_genre_dummies(data):
     ''' Add genres as dummy variables '''
     # transform into dummies
