@@ -288,3 +288,26 @@ def scattering(data, title, Type = None, color = None, add_kde = False, filename
     if save:
         plt.savefig(f'outputs/{filename}.png')
     plt.show()
+
+
+###################
+###    Genre    ###
+###################
+
+
+def hbarplot(x, y, title, colors = 'Blues_r', filename = None, save = False):
+    plt.figure(figsize=(15, 8))
+    sns.barplot(x=x, y=y, palette=colors).set(title=title)
+    if save:
+        plt.savefig(f'outputs/{filename}.png')
+    plt.show()
+
+def plotly_barplot(df, x, y, cmap, title = 'Barchart', filename = None, save = False):
+    fig = px.bar(df, x=x, y=y, color = y, title=title,
+    color_discrete_map = cmap)
+    fig.update_layout(title_x=0.5, autosize=False, width=800,height=600,)
+    # fig['layout']['yaxis']['autorange'] = "reversed"
+    if save:
+        fig.write_html(f"outputs/{filename}.html")
+    # fig.show('png')
+    fig.show()
