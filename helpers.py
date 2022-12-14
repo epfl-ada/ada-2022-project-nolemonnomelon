@@ -203,7 +203,7 @@ def year_distribution(data, title, filename = None, save=False):
 
 def plot_RRB_distr(dist, log=[False, False], xlim=True, title = 'Histrogram distribution', filename = None, save=False):
     fig, axs = plt.subplots(3, 1, figsize=(16, 14), sharey=True)
-    sns.histplot(dist.averageRating, ax=axs[0])
+    sns.histplot(dist.averageRating, ax=axs[0], binwidth=0.1)
     sns.histplot(dist['inflation corrected revenue'], ax=axs[1], log_scale=log)
     if xlim == True:
         axs[1].set_xlim([0, 8e8])
@@ -273,7 +273,7 @@ def reg_coef(x, y, color = None, label = None):
     ax.set_axis_off()
 
 
-def scattering(data, Type = None, color = None, add_kde = False, filename = None, save = False):
+def scattering(data, title, Type = None, color = None, add_kde = False, filename = None, save = False):
     if Type != 'All data':
         g = sns.PairGrid(data.loc[data['Type'] ==
                      Type], hue='Type', palette=[color])
@@ -284,7 +284,7 @@ def scattering(data, Type = None, color = None, add_kde = False, filename = None
     if add_kde:
         g.map_lower(sns.kdeplot, color = 'red')
     g.map_upper(reg_coef)
-    g.fig.suptitle(Type)
+    g.fig.suptitle(title)
     if save:
         plt.savefig(f'outputs/{filename}.png')
     plt.show()
