@@ -8,6 +8,7 @@ import ast
 import matplotlib.pyplot as plt
 import seaborn as sns
 import plotly.express as px
+import plotly.graph_objects as go
 from scipy.stats import pearsonr
 
 
@@ -59,20 +60,20 @@ def difference_in_usage(data_, g, CI_list, measure) :
     CI_list.append(b)
 
 
-def hist_subplots(data, measure, genre_names, subtitle, xlabel, xlim, ylim):
-    fig, axs = plt.subplots(5,4, constrained_layout=True, figsize=(20, 20))
+def hist_subplots(data, measure, genre_names, cmap, subtitle, xlabel, xlim, ylim):
+    fig, axs = plt.subplots(5,4, constrained_layout=True, figsize=(20, 15))
     fig.suptitle(subtitle)
 
     for i, g in enumerate(genre_names):
         ax = axs[int(i/4),i%4]
-        ax.hist(data[data[g]==1][measure], density=True)
+        ax.hist(data[data[g]==1][measure], density=True, color = cmap[g])
         ax.set_title(g)
         ax.set_xlim(xlim)
         ax.set_ylim(ylim)
         ax.set(xlabel=xlabel, ylabel='Density')
 
 
-def plot_CIs(CIs, params, xlabel=None):
+def plot_CIs(CIs, params, m_colors, xlabel=None):
     ''' Function to plot confidence intervals adapted code from solutions of tutorial 4 '''
 
     # Compute interval center and half interval length for plotting
@@ -81,26 +82,39 @@ def plot_CIs(CIs, params, xlabel=None):
 
     # plot CIs
     plt.figure(figsize=(8,5))
-    plt.errorbar(means, np.array(range(len(means))), xerr=one_sided_CI, linewidth=1,
-                 linestyle='none', marker='o', markersize=3,
-                 markerfacecolor='black', markeredgecolor='black', capsize=5)
+    Y = np.array(range(len(means)))
+    for mean, y, c, err in zip(means, Y, m_colors, one_sided_CI):
+        plt.errorbar(mean, y, xerr=err, linewidth=1, color = 'royalblue',
+                    linestyle='none', marker='o', markersize=7,
+                    markerfacecolor=c, markeredgecolor='black', capsize=5)
     #plt.vlines(0, 0, len(means), linestyle='--')
     plt.yticks(range(len(params)), params);
     plt.xlabel(xlabel)
-    plt.title('95% confidence intervals')
+    plt.title('Genre means 95% confidence intervals')
     plt.show()
 
 
-def barplot(res, figsize=(5,7)) :
+def barplot(res, xlabel, significant_only = False, cmap = None, figsize=(5,7)) :
     ''' Barplot of the coefficients of the linear regression sorted by value'''
     tmp = []
-    for name, value in zip(res.params.index, res.params):
-        tmp.append({"name": name, "value": value})
+    for name, value, p_val in zip(res.params.index, res.params, res.pvalues):
+        if not significant_only:
+            add_to_title = ''
+            tmp.append({"name": name, "value": value})
+        else:
+            add_to_title = 'significant'
+            if p_val < 0.05 / len(res.params):
+                tmp.append({"name": name, "value": value})
 
     features_coef = pd.DataFrame(tmp).sort_values("value")
 
     plt.subplots(figsize=figsize)
-    plt.barh(features_coef.name, features_coef.value, alpha=0.6)
+    cmap['Intercept'] = 'k'
+    plt.barh(features_coef.name, features_coef.value,
+            color = [cmap[genre] for genre in features_coef.name],
+            alpha=0.6)
+    plt.title(f'Regression coefficients of {add_to_title} genres')
+    plt.xlabel(xlabel)
     plt.show()
 
     
@@ -302,12 +316,32 @@ def hbarplot(x, y, title, colors = 'Blues_r', filename = None, save = False):
         plt.savefig(f'outputs/{filename}.png')
     plt.show()
 
-def plotly_barplot(df, x, y, cmap, title = 'Barchart', filename = None, save = False):
+def plotly_barplot(df, x, y, cmap, title = 'Barchart', err_bar = False, filename = None, save = False):
+    # if err_bar:
+    #     fig = px.bar(df, x=x, y=y, color = y, title=title,
+    #                 color_discrete_sequence=cmap).update_traces(error_x={
+    #                                                         "type": "data",
+    #                                                         "array": df["high"] - df[x],
+    #                                                                     })
+    # else:
     fig = px.bar(df, x=x, y=y, color = y, title=title,
-    color_discrete_map = cmap)
-    fig.update_layout(title_x=0.5, autosize=False, width=800,height=600,)
+                    color_discrete_sequence=cmap)
+    
+    if err_bar:
+        for med, genre, low, high in zip(df[x], df[y], df['low'], df['high']):
+            fig.add_trace(go.Scatter(
+                x=[med],
+                y=[genre],
+                error_x=dict(type='data',color = 'black',array=[med-low, high-med],visible=True),
+                marker=dict(color='rgba(0,0,0,0)', size=12),
+                showlegend=False
+                ))
+
+    fig['layout']['showlegend'] = False
+
+    fig.update_layout(title_x=0.5, autosize=False, width=800,
+            height=600, showlegend=False, yaxis={'categoryorder':'total ascending'})
     # fig['layout']['yaxis']['autorange'] = "reversed"
     if save:
         fig.write_html(f"outputs/{filename}.html")
-    # fig.show('png')
-    fig.show()
+    fig.show('png')
