@@ -44,12 +44,12 @@ All the details about the final dataset creation are available in the notebook [
 * Graphical representations, correlation with revenue, budget and rating.
 * Regression with selected features.  
 
-**Step 4: PCA and clustering.**
+**Step 4: PCA and clustering.** [`Clustering.ipynb`](https://github.com/epfl-ada/ada-2022-project-nolemonnomelon/blob/main/Clustering.ipynb)
 
 * Find characteristics of low budget movies space.
 * Determine regions with low budget and high revenue.
 
-**Step 5: Data story.**
+**Step 5: [Data story](https://loconsta.github.io/GoodMovieWithoutMoney/).**
 
 * Discussion.
 * Conclusion.
