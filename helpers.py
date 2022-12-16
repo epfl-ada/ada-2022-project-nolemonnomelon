@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import plotly.express as px
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 from scipy.stats import pearsonr
 
 
@@ -73,25 +74,34 @@ def hist_subplots(data, measure, genre_names, cmap, subtitle, xlabel, xlim, ylim
         ax.set(xlabel=xlabel, ylabel='Density')
 
 
-def plot_CIs(CIs, params, m_colors, xlabel=None):
+def plot_CIs(CIs, params, m_colors, xlabel=None, n=None, fig=None, axs=None):
     ''' Function to plot confidence intervals adapted code from solutions of tutorial 4 '''
 
     # Compute interval center and half interval length for plotting
     means = np.array([CI[0] for CI in CIs])
     one_sided_CI = np.array([(CI[2] - CI[1]) / 2 for CI in CIs])
-
-    # plot CIs
-    plt.figure(figsize=(8,5))
     Y = np.array(range(len(means)))
-    for mean, y, c, err in zip(means, Y, m_colors, one_sided_CI):
-        plt.errorbar(mean, y, xerr=err, linewidth=1, color = 'royalblue',
-                    linestyle='none', marker='o', markersize=7,
-                    markerfacecolor=c, markeredgecolor='black', capsize=5)
-    #plt.vlines(0, 0, len(means), linestyle='--')
-    plt.yticks(range(len(params)), params);
-    plt.xlabel(xlabel)
-    plt.title('Genre means 95% confidence intervals')
-    plt.show()
+    
+    if n == None:
+        plt.figure(figsize=(8,5))
+        for mean, y, c, err in zip(means, Y, m_colors, one_sided_CI):
+            plt.errorbar(mean, y, xerr=err, linewidth=1, color = 'royalblue',
+                        linestyle='none', marker='o', markersize=7,
+                        markerfacecolor=c, markeredgecolor='black', capsize=5)
+        #plt.vlines(0, 0, len(means), linestyle='--')
+        plt.yticks(range(len(params)), params);
+        plt.xlabel(xlabel)
+        plt.title('Genre means 95% confidence intervals')
+        plt.show()
+    else:
+        for mean, y, c, err in zip(means, Y, m_colors, one_sided_CI):
+            axs[n].errorbar(mean, y, xerr=err, linewidth=1, color = 'royalblue',
+                            linestyle='none', marker='o', markersize=7,
+                            markerfacecolor=c, markeredgecolor='black', capsize=5)
+        #plt.vlines(0, 0, len(means), linestyle='--')
+        axs[n].set_yticks(range(len(params)), params);
+        axs[n].set_xlabel(xlabel)
+        fig.suptitle('Genre means 95% confidence intervals')
 
 
 def barplot(res, xlabel, significant_only = False, cmap = None, figsize=(5,7)) :
@@ -118,59 +128,64 @@ def barplot(res, xlabel, significant_only = False, cmap = None, figsize=(5,7)) :
     plt.show()
 
     
-def plot_double_CIs(CIs_t1, CIs_t2, params, xlabel=None, figsize=(10,8), n = None, fig=None, axs=None):
+def plot_double_CIs(CIs_t1, CIs_t2, params, m_colors, xlabel=None, figsize=(10,8), n = None, fig=None, axs=None):
     # function to plot confidence intervals
     # adapted code from solutions of tutorial 4
+
+    # Compute interval center and half interval length for plotting for t1
+    means_1 = np.array([CI[0] for CI in CIs_t1])
+    one_sided_CI_1 = np.array([(CI[2] - CI[1]) / 2 for CI in CIs_t1])
+    
+    # Compute interval center and half interval length for plotting for t2
+    means_2 = np.array([CI[0] for CI in CIs_t2])
+    one_sided_CI_2 = np.array([(CI[2] - CI[1]) / 2 for CI in CIs_t2])
+
+    # Create variable to space the CIs vertically
+    Y = np.array(range(len(means_1)))
+
     if n == None:
-        # create figure
         plt.figure(figsize=figsize)
+        
+        for mean, y, c, err in zip(means_1, Y, m_colors, one_sided_CI_1):
+            # plot CIs
+            plt.errorbar(mean, y + 0.2, xerr=err, linewidth=1, color = 'royalblue',
+                    linestyle='none', marker='o', markersize=7,
+                    markerfacecolor=c, markeredgecolor='black', capsize=5)
 
-        # Compute interval center and half interval length for plotting for t1
-        means = np.array([CI[0] for CI in CIs_t1])
-        one_sided_CI = np.array([(CI[2] - CI[1]) / 2 for CI in CIs_t1])
-
-        # plot CIs
-        l1 = plt.errorbar(means, np.array(range(len(means))) + 0.2, xerr=one_sided_CI, linewidth=1,
-                 linestyle='none', marker='o', markersize=3,
-                 markerfacecolor='black', markeredgecolor='black', capsize=5)
-
-        # Compute interval center and half interval length for plotting for t2
-        means = np.array([CI[0] for CI in CIs_t2])
-        one_sided_CI = np.array([(CI[2] - CI[1]) / 2 for CI in CIs_t2])
-
-        # plot CIs
-        l2 = plt.errorbar(means, np.array(range(len(means))) - 0.1, xerr=one_sided_CI, linewidth=1,
-                 linestyle='none', marker='o', markersize=3,
-                 markerfacecolor='black', markeredgecolor='black', capsize=5)
+        for mean, y, c, err in zip(means_2, Y, m_colors, one_sided_CI_2):
+            # plot CIs
+            plt.errorbar(mean, y - 0.1, xerr=err, linewidth=1, color = 'darkorange',
+                    linestyle='none', marker='o', markersize=7,
+                    markerfacecolor=c, markeredgecolor='black', capsize=5)
     
         plt.yticks(range(len(params)), params);
         plt.xlabel(xlabel)
-        plt.title('95% confidence intervals')
-        plt.legend([l1, l2], ['old', 'recent'])
-    if n != None:
-        # Compute interval center and half interval length for plotting for t1
-        means = np.array([CI[0] for CI in CIs_t1])
-        one_sided_CI = np.array([(CI[2] - CI[1]) / 2 for CI in CIs_t1])
+        plt.title('Genre means 95% confidence intervals')
+        plt.legend([plt.plot([],ls="-", color='royalblue')[0],
+                    plt.plot([],ls="-", color='darkorange')[0]],
+                    ['old', 'recent'])
+        
 
-        # plot CIs
-        l1 = axs[n].errorbar(means, np.array(range(len(means))) + 0.2, xerr=one_sided_CI, linewidth=1,
-                 linestyle='none', marker='o', markersize=3,
-                 markerfacecolor='black', markeredgecolor='black', capsize=5)
+    else:
 
-        # Compute interval center and half interval length for plotting for t2
-        means = np.array([CI[0] for CI in CIs_t2])
-        one_sided_CI = np.array([(CI[2] - CI[1]) / 2 for CI in CIs_t2])
-
-        # plot CIs
-        l2 = axs[n].errorbar(means, np.array(range(len(means))) - 0.1, xerr=one_sided_CI, linewidth=1,
-                 linestyle='none', marker='o', markersize=3,
-                 markerfacecolor='black', markeredgecolor='black', capsize=5)
+        for mean, y, c, err in zip(means_1, Y, m_colors, one_sided_CI_1):
+            # plot CIs
+            axs[n].errorbar(mean, y + 0.2, xerr=err, linewidth=1, color='royalblue',
+                            linestyle='none', marker='o', markersize=7,
+                            markerfacecolor=c, markeredgecolor='black', capsize=5)
+        
+        for mean, y, c, err in zip(means_2, Y, m_colors, one_sided_CI_2):
+            # plot CIs
+            axs[n].errorbar(mean, y - 0.1, xerr=err, linewidth=1, color='darkorange',
+                            linestyle='none', marker='o', markersize=7,
+                            markerfacecolor=c, markeredgecolor='black', capsize=5)
     
         axs[n].set_yticks(range(len(params)), params);
         axs[n].set_xlabel(xlabel)
-        axs[n].set_title('95% confidence intervals')
-        axs[n].legend([l1, l2], ['old', 'recent'])
-
+        fig.suptitle('Genre means 95% confidence intervals')
+        axs[n].legend([plt.plot([],ls="-", color='royalblue')[0],
+                    plt.plot([],ls="-", color='darkorange')[0]],
+                    ['old', 'recent'])
 
 ###################
 ### Exploratory ###
@@ -316,16 +331,10 @@ def hbarplot(x, y, title, colors = 'Blues_r', filename = None, save = False):
         plt.savefig(f'outputs/{filename}.png')
     plt.show()
 
-def plotly_barplot(df, x, y, cmap, title = 'Barchart', err_bar = False, filename = None, save = False):
-    # if err_bar:
-    #     fig = px.bar(df, x=x, y=y, color = y, title=title,
-    #                 color_discrete_sequence=cmap).update_traces(error_x={
-    #                                                         "type": "data",
-    #                                                         "array": df["high"] - df[x],
-    #                                                                     })
-    # else:
-    fig = px.bar(df, x=x, y=y, color = y, title=title,
-                    color_discrete_sequence=cmap)
+def plotly_barplot(df, x, y, cmap, title = 'Barchart', err_bar = False, subplots=None, filename = None, save = False):
+        
+    fig = px.bar(df, x=x, y=y, color = y, title=title, facet_col=subplots,
+                    color_discrete_map=cmap)
     
     if err_bar:
         for med, genre, low, high in zip(df[x], df[y], df['low'], df['high']):
