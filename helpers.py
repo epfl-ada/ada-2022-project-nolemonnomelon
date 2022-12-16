@@ -67,7 +67,7 @@ def hist_subplots(data, measure, genre_names, cmap, subtitle, xlabel, xlim, ylim
 
     for i, g in enumerate(genre_names):
         ax = axs[int(i/4),i%4]
-        ax.hist(data[data[g]==1][measure], density=True, color = cmap[g])
+        ax.hist(data[data[g]==1][measure], density=True, color = cmap[g], bins=30)
         ax.set_title(g)
         ax.set_xlim(xlim)
         ax.set_ylim(ylim)
