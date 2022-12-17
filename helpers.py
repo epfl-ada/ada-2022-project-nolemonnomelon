@@ -7,10 +7,16 @@ import numpy as np
 import ast
 import matplotlib.pyplot as plt
 import seaborn as sns
+import scipy
+from scipy.stats import pearsonr
+from sklearn import decomposition
+
+import plotly
 import plotly.express as px
+import plotly.io as pio
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-from scipy.stats import pearsonr
+pio.renderers.default = 'jupyterlab'
 
 
 def incorporate_genre_dummies(data):
@@ -354,3 +360,223 @@ def plotly_barplot(df, x, y, cmap, title = 'Barchart', err_bar = False, subplots
     if save:
         fig.write_html(f"outputs/{filename}.html")
     fig.show('png')
+    
+
+########################
+###    Clustering    ###
+########################    
+
+def four_radar_charts(data_R_B, whole_data, name_cat='', ran=[0, 0.55]) :  
+    '''Plot 4 radar charts from the data_R_B that should be a list that contains 4 different data sets. We computed for each feature the fraction of the 
+    sum of the feature in the data set over the sum of the same feature in the whole data set.'''
+    # Columns names to label the charts, the same for all the 4 data sets
+    categories = data_R_B[0].columns.values
+
+    fig = make_subplots(rows=2, cols=2, specs=[[{'type': 'polar'}]*2]*2)
+
+    # Total count of the genres to normalize the count of the 4 groups 
+    total_count = whole_data.sum().values
+
+    fig.append_trace(go.Scatterpolar(r=data_R_B[0].sum().values/total_count, theta=categories, fill='toself', name='High rating - Low budget'), row=1, col=1)
+    fig.append_trace(go.Scatterpolar(r=data_R_B[1].sum().values/total_count, theta=categories, fill='toself', name='High rating - High budget'), row=1, col=2)
+    fig.append_trace(go.Scatterpolar(r=data_R_B[2].sum().values/total_count, theta=categories, fill='toself', name='Low rating - High budget'), row=2, col=1)
+    fig.append_trace(go.Scatterpolar(r=data_R_B[3].sum().values/total_count, theta=categories, fill='toself', name='Low rating - Low budget'), row=2, col=2)
+
+    fig.update_polars(radialaxis=dict(range=ran))
+
+    fig.update_layout(
+      polar=dict(
+        radialaxis=dict(
+          visible=True,
+        )),
+        width=1300,
+        height=1200,
+      showlegend=True,
+        title_text = 'Number of the movies over the total number of movies in the {} categorie (whole dataset) for each of the 4 subsets'.format(name_cat)
+    )
+
+    fig.show('jupyterlab')
+    
+def four_radar_charts_superposition(data_R_B, whole_data, name_cat='', ran=[0, 0.55]) :
+    '''Same as four_radar_charts but in only one radar chart by superposition.'''
+    # Columns names to label the charts, the same for all the 4 data sets
+    categories = data_R_B[0].columns.values
+    # Total count of the genres to normalize the count of the 4 groups 
+    total_count = whole_data.sum().values
+    
+    fig = go.Figure()
+
+    fig.add_trace(go.Scatterpolar(
+          r=data_R_B[0].sum().values/total_count,
+          theta=categories,
+          fill='toself',
+          name='High rating, low budget'
+    ))
+    fig.add_trace(go.Scatterpolar(
+          r=data_R_B[1].sum().values/total_count,
+          theta=categories,
+          fill='toself',
+          name='High rating, high budget'
+    ))
+
+    fig.add_trace(go.Scatterpolar(
+          r=data_R_B[2].sum().values/total_count,
+          theta=categories,
+          fill='toself',
+          name='Low rating, high budget'
+    ))
+
+    fig.add_trace(go.Scatterpolar(
+          r=data_R_B[3].sum().values/total_count,
+          theta=categories,
+          fill='toself',
+          name='Low rating, low budget'
+    ))
+
+    fig.update_layout(
+      polar=dict(
+        radialaxis=dict(
+          visible=True,
+          range=ran
+        )),
+        width=1300,
+        height=1000,
+      showlegend=True,
+        title_text = 'Number of the movies over the total number of movies in the {} categorie (whole dataset) for each of the 4 groups'.format(name_cat)
+    )
+
+    fig.show('jupyterlab')
+    
+def compute_ttest(data_1, data_vs, feat_list, data_1_name='High rating - low budget', data_vs_name= 'the rest') : 
+    '''Compute independent t-tests of the data_1 vs data_vs dataframes with the greater alternative for the features that are given in feat_list. It also
+    prints the results.'''
+    for f in feat_list : 
+        print(f)
+        print('{} vs {} pval : {}'.format(data_1_name, data_vs_name, \
+            scipy.stats.ttest_ind(data_1[f], data_vs[f], alternative='greater').pvalue))
+        print('\n')
+             
+def compute_and_plot_CI_with_data_separation(data_1, data_vs, m_colors, data_1_name = 'High rating - Low budget movies', data_vs_name = 'The rest of the data', \
+               actors_params=['mean_age', 'mean_height', 'fraction_men'], cutoff_date=2000) :
+    '''Compute and plot CI with bootstrap from 2 different dataframes (data_1 and data_vs) separated into old and recent movies (cutoff_date) 
+    for the actor attributes features (actors_params).'''
+    
+    # Split data in two periods: from 1959 to 2000 and from 2000 to 2021.
+    old_movies_1 = data_1[data_1.date < cutoff_date]
+    recent_movies_1 = data_1[data_1.date >= cutoff_date]
+    old_movie_data_vs = data_vs[data_vs.date < cutoff_date]
+    recent_movie_data_vs = data_vs[data_vs.date > cutoff_date]
+    
+    CIs_old = []
+    CIs_recent = []
+    CIs_old_vs = []
+    CIs_recent_vs = []
+    
+    # Boostrap for all the actors parameters and the data sets
+    for p in actors_params :
+        CIs_old.append(bootstrap(old_movies_1[p], 1000))
+        CIs_recent.append(bootstrap(recent_movies_1[p], 1000))
+        CIs_old_vs.append(bootstrap(old_movie_data_vs[p], 1000))
+        CIs_recent_vs.append(bootstrap(recent_movie_data_vs[p], 1000))
+    
+    # Plot the CI
+    for i in range(3) :
+        plot_double_CIs([CIs_old[i], CIs_old_vs[i]], [CIs_recent[i], CIs_recent_vs[i]], params= \
+                        [data_1_name, data_vs_name], xlabel=actors_params[i], figsize=(5,2), m_colors=m_colors)
+        
+def single_radar_chart(subset, whole_data, name_cat='') :   
+    '''Plot a single radar chart of the subset data. We computed for each feature the fraction of the sum of the feature in the subset data set 
+    over the sum of the same feature in the whole data set.'''
+    # Total count of the genres to normalize the count 
+    total_count = whole_data.sum().values
+
+    fig = go.Figure(data=go.Scatterpolar(r=subset.sum().values/total_count, theta=subset.columns.values, \
+                                         fill='toself', name='high fraction (revenue / budget) and low budget'))
+
+    fig.update_polars(radialaxis=dict(range=[0, 0.55]))
+
+    fig.update_layout(
+      polar=dict(
+        radialaxis=dict(
+          visible=True,
+        )),
+        width=950,
+        height=500,
+      showlegend=True,
+        title_text = 'Number of the movies over the total number of movies in the {} categorie in the whole dataset'.format(name_cat)
+    )
+
+    fig.show('jupyterlab')
+    
+def standardize(data) :
+    '''Standardize a feature'''
+    return (data - np.nanmean(data)) / np.std(data)
+
+def data_for_pca(data, not_split=True) :
+    '''Prepare the data for the PCA, it standardizes some features and drop one that is useless. If the data are split into train and test set (not_split
+    =Flase), we want to only standardize the actor attributes.'''
+    if not_split :
+        data_pca = data.drop(columns=['log_fraction_rev_bud'])
+        data_pca['log_budget'] = standardize(data_pca['log_budget'])
+        data_pca['log_revenue'] = standardize(data_pca['log_revenue'])
+        data_pca['averageRating'] = standardize(data_pca['averageRating'])
+    else : 
+        data_pca = data.copy()
+    data_pca['mean_age'] = standardize(data_pca['mean_age'])
+    data_pca['mean_height'] = standardize(data_pca['mean_height'])
+    data_pca['fraction_men'] = standardize(data_pca['fraction_men'])
+    return data_pca
+
+def plot_PCA(data_pca, color_label='averageRating', name_columns = None, color_feat = None, n_components=10) :
+    '''Compute and plot a PCA with n_components components with a specific color that can be given only with color_label if it is a column name of the
+    data_pca or by specifying the color_feat if it is not. color_feat has to have the same size as the columns of the data_pca.'''
+    if color_feat is None : 
+        color_feat = data_pca[color_label]
+        
+    pca = decomposition.PCA(n_components=n_components)
+    if name_columns is None:
+        components = pca.fit_transform(data_pca)
+    else: components = pca.fit_transform(data_pca[name_columns])
+
+    total_var = pca.explained_variance_ratio_.sum() * 100
+
+    labels = {str(i): f"PC {i+1}" for i in range(n_components)}
+    labels['color'] = color_label
+    
+    fig = px.scatter_matrix(
+        components,
+        color = color_feat,
+        dimensions=range(n_components),
+        labels=labels,
+        title=f'Total Explained Variance: {total_var:.2f}%',
+    )
+    fig.update_traces(diagonal_visible=False)
+
+    fig.update_layout(
+        width=1300,
+        height=1300,
+        showlegend=True,
+        )
+
+    fig.show('jupyterlab')
+    
+def variance_explained_plot(pca) :
+    '''Plot the PCs vs the total variance explained'''
+    plt.figure(figsize=(8,5))
+    plt.title('Cumulative variance explained')
+    sns.lineplot(x = np.arange(1,11,1), y = np.cumsum(pca.explained_variance_ratio_))
+    plt.xlabel('Principal Components')
+    plt.ylabel('Variance explained')
+    plt.show()
+    
+def heatmap_pca(pca, index) :
+    '''Plot the heatmap of the loads of the features associated with each PC'''
+    loadings = pd.DataFrame(pca.components_.T, columns=['PC1', 'PC2', 'PC3', 'PC4', 'PC5', 'PC6', 'PC7', 'PC8', 'PC9', 'PC10'], index = index)
+    fig, ax = plt.subplots(figsize=(10, 10))
+    sns.heatmap(loadings, annot=True, fmt='.2f')
+    plt.show()
+
+def split_set(data_to_split, ratio=0.7):
+    '''Split the data into train and test sets according to the ratio.'''
+    mask = np.random.rand(len(data_to_split)) < ratio
+    return [data_to_split[mask].reset_index(drop=True), data_to_split[~mask].reset_index(drop=True)]
