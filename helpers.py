@@ -1,6 +1,6 @@
-##################################################################
-# This script contains some helper functions
-##################################################################
+##############################################
+# This script contains some helper functions #
+##############################################
 
 import pandas as pd
 import numpy as np
@@ -20,7 +20,14 @@ pio.renderers.default = 'jupyterlab'
 
 
 def incorporate_genre_dummies(data):
-    ''' Add genres as dummy variables '''
+    """Add genres as dummy variables
+
+    Args:
+        data (dataframe): dataframe with column 'Movie genres names' to make dummmies from
+
+    Returns:
+        dataframe: same dataframe with dummies added
+    """
     # transform into dummies
     movie_genres = [ast.literal_eval(movie_genre) for movie_genre in data['Movie genres names']]
     df = pd.get_dummies(pd.DataFrame(movie_genres))
@@ -43,6 +50,16 @@ def incorporate_genre_dummies(data):
 
 # Create the bootstrap function
 def bootstrap(data, n_it, also_median = False):
+    """ Computes a 95% CI around the data mean and median if necessary
+
+    Args:
+        data (list/np.array): data to bootstrap
+        n_it (int): number of times to do a bootstrap approximation
+        also_median (bool, optional): True if metrics for median should also be returned. Defaults to False.
+
+    Returns:
+        list: mean(median) and 95% interval percentiles
+    """
     means = np.zeros(n_it)
     data = np.array(data)
     if also_median:
@@ -60,7 +77,16 @@ def bootstrap(data, n_it, also_median = False):
     else:
         return [np.nanmean(means), np.nanpercentile(means, 2.5),np.nanpercentile(means, 97.5)]
 
+
 def difference_in_usage(data_, g, CI_list, measure) :
+    """ Computes bootstrap estimate of 95% CI for a given column in dataframe and appends it to a list
+
+    Args:
+        data_ (dataframe): dataframe containing the columns we want to bootstrap on
+        g (string): column which contains 1 at elements which we will use for the bootstrap
+        CI_list (list): list to which we append the bootstrap estimates
+        measure (string): measure we bootstrap on (conditional on g)
+    """
     #difference returns -1 (absent for winner and present for the loser), 0 (present or absent in both), or 1 (present for the winner and absent for looser). 
     d = data_[data_[g]==1][measure]
     b = bootstrap(d, 1000)
@@ -68,6 +94,18 @@ def difference_in_usage(data_, g, CI_list, measure) :
 
 
 def hist_subplots(data, measure, genre_names, cmap, subtitle, xlabel, xlim, ylim):
+    """ Plots histograms of a given measure for each genre
+
+    Args:
+        data (dataframe): complete movie dataframe
+        measure (string): measure we will count
+        genre_names (list of strings): genres we will do an histogram for
+        cmap (list of rgb colors): colormap associated to genre_names
+        subtitle (string): title of plot
+        xlabel (string): label of x axis
+        xlim (int/tuple): limits on x axis
+        ylim (int/tuple): limits on y axis
+    """
     fig, axs = plt.subplots(5,4, constrained_layout=True, figsize=(20, 15))
     fig.suptitle(subtitle)
 
@@ -81,7 +119,17 @@ def hist_subplots(data, measure, genre_names, cmap, subtitle, xlabel, xlim, ylim
 
 
 def plot_CIs(CIs, params, m_colors, xlabel=None, n=None, fig=None, axs=None):
-    ''' Function to plot confidence intervals adapted code from solutions of tutorial 4 '''
+    """Function to plot confidence intervals (originally adapted code from solutions of tutorial 4)
+
+    Args:
+        CIs (tuple list): list of lower and upper percentiles for each category
+        params (list of strings): categories plotted
+        m_colors (list of rgb colors): colormap associated to genre_names
+        xlabel (string, optional): label of x. Defaults to None.
+        n (int, optional): ax number to plot on. Defaults to None.
+        fig (fig object, optional): figure containing the axes. Defaults to None.
+        axs (ax object, optional): figure ax to plot the CIs on. Defaults to None.
+    """
 
     # Compute interval center and half interval length for plotting
     means = np.array([CI[0] for CI in CIs])
@@ -109,34 +157,21 @@ def plot_CIs(CIs, params, m_colors, xlabel=None, n=None, fig=None, axs=None):
         axs[n].set_xlabel(xlabel)
         fig.suptitle('Genre means 95% confidence intervals')
 
-
-def barplot(res, xlabel, significant_only = False, cmap = None, figsize=(5,7)) :
-    ''' Barplot of the coefficients of the linear regression sorted by value'''
-    tmp = []
-    for name, value, p_val in zip(res.params.index, res.params, res.pvalues):
-        if not significant_only:
-            add_to_title = ''
-            tmp.append({"name": name, "value": value})
-        else:
-            add_to_title = 'significant'
-            if p_val < 0.05 / len(res.params):
-                tmp.append({"name": name, "value": value})
-
-    features_coef = pd.DataFrame(tmp).sort_values("value")
-
-    plt.subplots(figsize=figsize)
-    cmap['Intercept'] = 'k'
-    plt.barh(features_coef.name, features_coef.value,
-            color = [cmap[genre] for genre in features_coef.name],
-            alpha=0.6)
-    plt.title(f'Regression coefficients of {add_to_title} genres')
-    plt.xlabel(xlabel)
-    plt.show()
-
     
 def plot_double_CIs(CIs_t1, CIs_t2, params, m_colors, xlabel=None, figsize=(10,8), n = None, fig=None, axs=None):
-    # function to plot confidence intervals
-    # adapted code from solutions of tutorial 4
+    """Function to plot confidence intervals (originally adapted code from solutions of tutorial 4)
+
+    Args:
+        CIs_t1 (tuple list): list of lower and upper percentiles for each category, group 1
+        CIs_t2 (tuple list): list of lower and upper percentiles for each category, group 2
+        params (list of strings): categories plotted
+        m_colors (list of rgb colors): colormap associated to genre_names
+        xlabel (string, optional): label of x. Defaults to None.
+        figsize (tuple, optional): size of figure.
+        n (int, optional): ax number to plot on. Defaults to None.
+        fig (fig object, optional): figure containing the axes. Defaults to None.
+        axs (ax object, optional): figure ax to plot the CIs on. Defaults to None.
+    """
 
     # Compute interval center and half interval length for plotting for t1
     means_1 = np.array([CI[0] for CI in CIs_t1])
@@ -193,6 +228,39 @@ def plot_double_CIs(CIs_t1, CIs_t2, params, m_colors, xlabel=None, figsize=(10,8
                     plt.plot([],ls="-", color='darkorange')[0]],
                     ['old', 'recent'])
 
+
+def barplot(res, xlabel, significant_only = False, cmap = None, figsize=(5,7)) :
+    """Barplot of the coefficients of the linear regression sorted by value
+
+    Args:
+        res (mod.fit() object): results from model fitted usinf smf.ols()
+        xlabel (string): label of x
+        significant_only (bool, optional): True if we want to plot only the significant coefficients. Defaults to False.
+        cmap (dict of rgb colors, optional): Colormap corresponding to the fitted parameters. Defaults to None.
+        figsize (tuple, optional): size of the figure. Defaults to (5,7).
+    """
+    tmp = []
+    for name, value, p_val in zip(res.params.index, res.params, res.pvalues):
+        if not significant_only:
+            add_to_title = ''
+            tmp.append({"name": name, "value": value})
+        else:
+            add_to_title = 'significant'
+            if p_val < 0.05 / len(res.params):
+                tmp.append({"name": name, "value": value})
+
+    features_coef = pd.DataFrame(tmp).sort_values("value")
+
+    plt.subplots(figsize=figsize)
+    cmap['Intercept'] = 'k'
+    plt.barh(features_coef.name, features_coef.value,
+            color = [cmap[genre] for genre in features_coef.name],
+            alpha=0.6)
+    plt.title(f'Regression coefficients of {add_to_title} genres')
+    plt.xlabel(xlabel)
+    plt.show()
+
+
 ###################
 ### Exploratory ###
 ###################
@@ -223,6 +291,14 @@ def mean_median(data, feature):
     return [years, mean_without_inf, median_without_inf, mean_with_inf, median_with_inf]
 
 def year_distribution(data, title, filename = None, save=False):
+    """ Plots the number of movies per year in data using plotly
+
+    Args:
+        data (dataframe): contains movies and their release date
+        title (string): title of plot
+        filename (string, optional): name of file if saving is enabled. Defaults to None.
+        save (bool, optional): option to save the plot. Defaults to False.
+    """
     df_column = data.copy()
     df_column.dropna(subset=['Movie release date'], inplace=True)
     count = df_column['Movie release date'].value_counts()
