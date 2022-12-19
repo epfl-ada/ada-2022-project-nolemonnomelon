@@ -48,7 +48,6 @@ def incorporate_genre_dummies(data):
     return data, genre_names
 
 
-# Create the bootstrap function
 def bootstrap(data, n_it, also_median = False):
     """ Computes a 95% CI around the data mean and median if necessary
 
@@ -267,6 +266,15 @@ def barplot(res, xlabel, significant_only = False, cmap = None, figsize=(5,7)) :
 
 
 def mean_median(data, feature):
+    """ Computes mean and median for a the wanted features by years
+
+    Args:
+        data (dataframe): contains the features
+        feature (list): contains 2 features for which we compute the metrics
+
+    Returns:
+        list: years in data, mean f1, median f1, mean f2, median f2
+    """
     years = np.sort(data['Movie release date'].unique())
     mean_without_inf = np.zeros_like(years)
     mean_with_inf = np.zeros_like(years)
@@ -290,29 +298,18 @@ def mean_median(data, feature):
 
     return [years, mean_without_inf, median_without_inf, mean_with_inf, median_with_inf]
 
-def year_distribution(data, title, filename = None, save=False):
-    """ Plots the number of movies per year in data using plotly
-
-    Args:
-        data (dataframe): contains movies and their release date
-        title (string): title of plot
-        filename (string, optional): name of file if saving is enabled. Defaults to None.
-        save (bool, optional): option to save the plot. Defaults to False.
-    """
-    df_column = data.copy()
-    df_column.dropna(subset=['Movie release date'], inplace=True)
-    count = df_column['Movie release date'].value_counts()
-    # plt.figure(figsize=(20,8))
-    df = pd.DataFrame({'Year': count.index.astype('int64'), 'Movie count': count.values})
-    fig = px.bar(df, x='Year', y='Movie count',
-                 color='Movie count', title=title)
-    fig.update_layout(title_x=0.5)
-    if save:
-        fig.write_html(f"outputs/{filename}.html")
-    fig.show('png')
-
 
 def plot_RRB_distr(dist, log=[False, False], xlim=True, title = 'Histrogram distribution', filename = None, save=False):
+    """ Plots histogram of our revenue, rating, budget distributions
+
+    Args:
+        dist (dataframe): contains the features
+        log (list, optional): possibility to logscale the axes. Defaults to [False, False].
+        xlim (bool, optional): possibility the limit the x axe. Defaults to True.
+        title (str, optional): plot title. Defaults to 'Histrogram distribution'.
+        filename (str, optional): filename in case saving is enabled. Defaults to None.
+        save (bool, optional): possibility to save plot. Defaults to False.
+    """
     fig, axs = plt.subplots(3, 1, figsize=(16, 14), sharey=True)
     sns.histplot(dist.averageRating, ax=axs[0], binwidth=0.1)
     sns.histplot(dist['inflation corrected revenue'], ax=axs[1], log_scale=log)
@@ -328,6 +325,19 @@ def plot_RRB_distr(dist, log=[False, False], xlim=True, title = 'Histrogram dist
     plt.show()
 
 def plot_RRB_across_time(years, mean, median, low, high, low_median, high_median, filename = None, save = False):
+    """ Plots mean and median revenue, rating, budget through time with CIs
+
+    Args:
+        years (np array): release years in dataset
+        mean (np array): means per feature (3 rows)
+        median (np array): medians per feature (3 rows)
+        low (np array): lower CI percentiles for means per feature per year (3 rows)
+        high (np array): upper CI percentiles for means per feature per year (3 rows)
+        low_median (np array): lower CI percentiles for medians per feature per year (3 rows)
+        high_median (np array): upper CI percentiles for medians per feature per year (3 rows)
+        filename (str, optional): filename in case saving is enabled. Defaults to None.
+        save (bool, optional): possibility to save plot. Defaults to False.
+    """
     fig, ax = plt.subplots(3,1,figsize=(16,10),sharex=True)
 
     for i in range(3):
@@ -375,6 +385,14 @@ def plot_mean_median(input_mean_median, ylabel, filename = None, save=False):
 
 
 def reg_coef(x, y, color = None, label = None):
+    """ Computes regression coefficients between x and y variables
+
+    Args:
+        x (np array): first variable
+        y (np array): second variable
+        color (None, optional): needed to use within scattering function. Defaults to None.
+        label (None, optional): needed to use within scattering function. Defaults to None.
+    """
     ax = plt.gca()
     r, p = pearsonr(x, y)
     ax.annotate('r = {:.2f}'.format(r), xy=(0.5, 0.6),
@@ -385,6 +403,17 @@ def reg_coef(x, y, color = None, label = None):
 
 
 def scattering(data, title, Type = None, color = None, add_kde = False, filename = None, save = False):
+    """ Scatters relations between our RRB variables
+
+    Args:
+        data (dataframe): contains the variables
+        title (string): plot title
+        Type (string, optional): Either median or mean. Defaults to None.
+        color (string, optional): plot color. Defaults to None.
+        add_kde (bool, optional): Possibility to draw density on top of the scattering. Defaults to False.
+        filename (str, optional): filename in case saving is enabled. Defaults to None.
+        save (bool, optional): possibility to save plot. Defaults to False.
+    """
     if Type != 'All data':
         g = sns.PairGrid(data.loc[data['Type'] ==
                      Type], hue='Type', palette=[color])
@@ -405,16 +434,59 @@ def scattering(data, title, Type = None, color = None, add_kde = False, filename
 ###    Genre    ###
 ###################
 
+def year_distribution(data, title, filename = None, save=False):
+    """ Plots the number of movies per year in data using plotly
+
+    Args:
+        data (dataframe): contains movies and their release date
+        title (string): title of plot
+        filename (string, optional): name of file if saving is enabled. Defaults to None.
+        save (bool, optional): option to save the plot. Defaults to False.
+    """
+    df_column = data.copy()
+    df_column.dropna(subset=['Movie release date'], inplace=True)
+    count = df_column['Movie release date'].value_counts()
+    # plt.figure(figsize=(20,8))
+    df = pd.DataFrame({'Year': count.index.astype('int64'), 'Movie count': count.values})
+    fig = px.bar(df, x='Year', y='Movie count',
+                 color='Movie count', title=title)
+    fig.update_layout(title_x=0.5)
+    if save:
+        fig.write_html(f"outputs/{filename}.html")
+    fig.show('png')
 
 def hbarplot(x, y, title, colors = 'Blues_r', filename = None, save = False):
+    """ Plots the number of movies per year in data using matplotlib
+
+    Args:
+        x (list): x variables
+        y (list): y variables
+        title (string): plot title
+        colors (str/list, optional): list of rgb colors or colormap associated to the y variables. Defaults to 'Blues_r'.
+        filename (string, optional): name of file if saving is enabled. Defaults to None.
+        save (bool, optional): option to save the plot. Defaults to False.
+    """
     plt.figure(figsize=(15, 8))
     sns.barplot(x=x, y=y, palette=colors).set(title=title)
     if save:
         plt.savefig(f'outputs/{filename}.png')
     plt.show()
 
+
 def plotly_barplot(df, x, y, cmap, title = 'Barchart', err_bar = False, subplots=None, filename = None, save = False):
-        
+    """ Plots the x-values associated to the y variable (movie genres) in df
+
+    Args:
+        df (dataframe): contains the data
+        x (string): df column containing the variable associated to genres
+        y (string): column containing the y variable (movie genre)
+        cmap (dict): dict of hex colors associated to the y variables
+        title (str, optional): plot title. Defaults to 'Barchart'.
+        err_bar (bool, optional): error bars associated to the x variables. Defaults to False.
+        subplots (string, optional): Dataframe column for which subplots will be made. Defaults to None.
+        filename (string, optional): name of file if saving is enabled. Defaults to None.
+        save (bool, optional): option to save the plot. Defaults to False.
+    """
     fig = px.bar(df, x=x, y=y, color = y, title=title, facet_col=subplots,
                     color_discrete_map=cmap)
     
@@ -437,6 +509,7 @@ def plotly_barplot(df, x, y, cmap, title = 'Barchart', err_bar = False, subplots
         fig.write_html(f"outputs/{filename}.html")
     fig.show('png')
     
+
 
 ########################
 ###    Clustering    ###
