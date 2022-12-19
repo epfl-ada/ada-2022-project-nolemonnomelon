@@ -144,7 +144,7 @@ def plot_CIs(CIs, params, m_colors, xlabel=None, n=None, fig=None, axs=None):
         #plt.vlines(0, 0, len(means), linestyle='--')
         plt.yticks(range(len(params)), params);
         plt.xlabel(xlabel)
-        plt.title('Genre means 95% confidence intervals')
+        plt.title('Means 95% confidence intervals')
         plt.show()
     else:
         for mean, y, c, err in zip(means, Y, m_colors, one_sided_CI):
@@ -154,7 +154,7 @@ def plot_CIs(CIs, params, m_colors, xlabel=None, n=None, fig=None, axs=None):
         #plt.vlines(0, 0, len(means), linestyle='--')
         axs[n].set_yticks(range(len(params)), params);
         axs[n].set_xlabel(xlabel)
-        fig.suptitle('Genre means 95% confidence intervals')
+        fig.suptitle('Means 95% confidence intervals')
 
     
 def plot_double_CIs(CIs_t1, CIs_t2, params, m_colors, xlabel=None, figsize=(10,8), n = None, fig=None, axs=None):
@@ -200,7 +200,7 @@ def plot_double_CIs(CIs_t1, CIs_t2, params, m_colors, xlabel=None, figsize=(10,8
     
         plt.yticks(range(len(params)), params);
         plt.xlabel(xlabel)
-        plt.title('Genre means 95% confidence intervals')
+        plt.title('Means 95% confidence intervals')
         plt.legend([plt.plot([],ls="-", color='royalblue')[0],
                     plt.plot([],ls="-", color='darkorange')[0]],
                     ['old', 'recent'])
@@ -222,7 +222,7 @@ def plot_double_CIs(CIs_t1, CIs_t2, params, m_colors, xlabel=None, figsize=(10,8
     
         axs[n].set_yticks(range(len(params)), params);
         axs[n].set_xlabel(xlabel)
-        fig.suptitle('Genre means 95% confidence intervals')
+        fig.suptitle('Means 95% confidence intervals')
         axs[n].legend([plt.plot([],ls="-", color='royalblue')[0],
                     plt.plot([],ls="-", color='darkorange')[0]],
                     ['old', 'recent'])
@@ -516,8 +516,8 @@ def plotly_barplot(df, x, y, cmap, title = 'Barchart', err_bar = False, subplots
 ########################    
 
 def four_radar_charts(data_R_B, whole_data, name_cat='', ran=[0, 0.55]) :  
-    '''Plot 4 radar charts from the data_R_B that should be a list that contains 4 different data sets. We computed for each feature the fraction of the 
-    sum of the feature in the data set over the sum of the same feature in the whole data set.'''
+    '''Plot 4 radar charts from the data_R_B that should be a list that contains 4 different data sets. We computed for each feature the fraction of
+    the sum of the feature in the data set over the sum of the same feature in the whole data set.'''
     # Columns names to label the charts, the same for all the 4 data sets
     categories = data_R_B[0].columns.values
 
@@ -541,7 +541,7 @@ def four_radar_charts(data_R_B, whole_data, name_cat='', ran=[0, 0.55]) :
         width=1300,
         height=1200,
       showlegend=True,
-        title_text = 'Number of the movies over the total number of movies in the {} categorie (whole dataset) for each of the 4 subsets'.format(name_cat)
+        title_text = '{} representation in the subsets'.format(name_cat)
     )
 
     fig.show('jupyterlab')
@@ -591,22 +591,21 @@ def four_radar_charts_superposition(data_R_B, whole_data, name_cat='', ran=[0, 0
         width=1300,
         height=1000,
       showlegend=True,
-        title_text = 'Number of the movies over the total number of movies in the {} categorie (whole dataset) for each of the 4 groups'.format(name_cat)
+        title_text = '{} representation in the subsets'.format(name_cat)
     )
 
     fig.show('jupyterlab')
     
 def compute_ttest(data_1, data_vs, feat_list, data_1_name='High rating - low budget', data_vs_name= 'the rest') : 
-    '''Compute independent t-tests of the data_1 vs data_vs dataframes with the greater alternative for the features that are given in feat_list. It also
-    prints the results.'''
+    '''Compute independent t-tests of the data_1 vs data_vs dataframes with the greater alternative for the features that are given in feat_list. It
+    also prints the results.'''
     for f in feat_list : 
         print(f)
         print('{} vs {} pval : {}'.format(data_1_name, data_vs_name, \
             scipy.stats.ttest_ind(data_1[f], data_vs[f], alternative='greater').pvalue))
         print('\n')
              
-def compute_and_plot_CI_with_data_separation(data_1, data_vs, m_colors, data_1_name = 'High rating - Low budget movies', data_vs_name = 'The rest of the data', \
-               actors_params=['mean_age', 'mean_height', 'fraction_men'], cutoff_date=2000) :
+def compute_and_plot_CI_with_data_separation(data_1, data_vs, m_colors, data_1_name = 'High rating - Low budget movies', data_vs_name = 'The rest of the data', actors_params=['mean_age', 'mean_height', 'fraction_men'], cutoff_date=2000) :
     '''Compute and plot CI with bootstrap from 2 different dataframes (data_1 and data_vs) separated into old and recent movies (cutoff_date) 
     for the actor attributes features (actors_params).'''
     
@@ -652,7 +651,8 @@ def single_radar_chart(subset, whole_data, name_cat='') :
         width=950,
         height=500,
       showlegend=True,
-        title_text = 'Number of the movies over the total number of movies in the {} categorie in the whole dataset'.format(name_cat)
+        title_text = '{} representation in the subset'.format(name_cat)
+        #title_text = 'Number of the movies over the total number of movies in the {} categorie in the whole dataset'.format(name_cat)
     )
 
     fig.show('jupyterlab')
@@ -662,8 +662,8 @@ def standardize(data) :
     return (data - np.nanmean(data)) / np.std(data)
 
 def data_for_pca(data, not_split=True) :
-    '''Prepare the data for the PCA, it standardizes some features and drop one that is useless. If the data are split into train and test set (not_split
-    =Flase), we want to only standardize the actor attributes.'''
+    '''Prepare the data for the PCA, it standardizes some features and drop one that is useless. If the data are split into train and test set
+    (not_split=Flase), we want to only standardize the actor attributes.'''
     if not_split :
         data_pca = data.drop(columns=['log_fraction_rev_bud'])
         data_pca['log_budget'] = standardize(data_pca['log_budget'])
@@ -690,7 +690,7 @@ def plot_PCA(data_pca, color_label='averageRating', name_columns = None, color_f
     total_var = pca.explained_variance_ratio_.sum() * 100
 
     labels = {str(i): f"PC {i+1}" for i in range(n_components)}
-    labels['color'] = color_label
+    labels['color'] = 'standardized ' + color_label
     
     fig = px.scatter_matrix(
         components,
