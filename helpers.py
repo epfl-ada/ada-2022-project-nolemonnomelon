@@ -10,14 +10,22 @@ import seaborn as sns
 import scipy
 from scipy.stats import pearsonr
 from sklearn import decomposition
+import itertools
 
-import plotly
 import plotly.express as px
 import plotly.io as pio
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 pio.renderers.default = 'jupyterlab'
 
+import holoviews as hv
+from holoviews import opts, dim
+hv.extension('bokeh')
+hv.output(size=200)
+
+# hide unexplained holoview warning
+import warnings
+warnings.filterwarnings('ignore')
 
 def incorporate_genre_dummies(data):
     """Add genres as dummy variables
@@ -510,6 +518,106 @@ def plotly_barplot(df, x, y, cmap, title = 'Barchart', err_bar = False, subplots
     fig.show('png')
     
 
+def cooccurence_matrix(movie_genres, genre_list):
+    """ Creates connectivity matrix from movie genre lists
+
+    Args:
+        movie_genres (list of lists): associations of genres for every movie
+        genre_list (list): individual genres
+
+    Returns:
+        np array, dict: co-occurence matrix, genre to index mapping associated to the matrix
+    """
+    cooc_matrix = np.zeros((len(genre_list), len(genre_list))).astype(int)
+    # create index to genre mapping
+    map_ = {genre: i for i, genre in enumerate(genre_list)}
+
+    # we create a connection for all pairwise genre combination and a count individual occurences
+    for genre_list in movie_genres:
+        # handle unique genre
+        if len(genre_list) == 1:
+            genre = genre_list[0]
+            cooc_matrix[map_[genre], map_[genre]] += 1
+
+        # count all pairwise combinations and count individual occurences
+        else:
+            for comb in itertools.combinations(genre_list, 2):
+                # increment on both sides of symmetric matrix
+                cooc_matrix[map_[comb[0]], map_[comb[1]]] += 1
+                cooc_matrix[map_[comb[1]], map_[comb[0]]] += 1
+
+    # delete symmetric values but keep diagonal
+    cooc_matrix = np.triu(cooc_matrix, k=0)
+    return cooc_matrix, map_
+
+def prepare_chord(cooc_matrix, map_):
+    """ Transform the connectivity matrix into edges and nodes for holoview formats
+
+    Args:
+        cooc_matrix (np array): coocurrence matrix for movie genres
+        map_ (dict): dict: genre to index mapping associated to the matrix
+
+    Returns:
+        dataframe, holoview Dataset object: cooccurence in holoview readable format
+    """
+    # Build a dataframe with connections
+    edge_list = pd.DataFrame(cooc_matrix).stack()
+    edge_list = edge_list[edge_list != 0]
+
+    # prepare format for holoview
+    links = pd.DataFrame({'source' : [ind[0] for ind in edge_list.index],
+                        'target' : [ind[1] for ind in edge_list.index],
+                        'value' : edge_list.values})
+    nodes = hv.Dataset(pd.DataFrame(
+        {'Genre': map_.keys(), 'group': map_.values()}), 'index')
+
+    return links, nodes
+
+def one_chord(links, nodes, thres, colors):
+    """ Create a chord diagram
+
+    Args:
+        links (dataframe): source targets and value (cooccurence)
+        nodes (holoview dataset object): index to genre mapping
+        thres (int): min number of co-occurences
+        colors (dict): colormap associated to genres
+
+    Returns:
+        holoview diagram object: one diagram frame
+    """
+    # drop elements under threshold
+    links.drop(links[links['value'] < thres].index, inplace=True)
+    # obtain remaining nodes
+    new_idx = np.union1d(links.source.unique(), links.target.unique())
+    nodes.data.drop(nodes.data[~nodes.data['index'].isin(new_idx)].index, inplace=True)
+    
+    chord = hv.Chord((links, nodes)).select(value=(0, None))
+    diag = chord.opts(
+            opts.Chord(cmap=[colors[genre] for genre in nodes['Genre']],
+                    edge_cmap=[colors[genre] for genre in nodes['Genre']],
+                    edge_color=dim('source').str(), 
+                    labels='Genre', node_color=dim('Genre').str()))
+    return diag
+
+def multiple_chord(links, nodes, thres_list, colors, save = False):
+    """ Creates multiple diagram frames for differents thresholds by calling one_chord()
+
+    Args:
+        links (dataframe): source targets and value (cooccurence)
+        nodes (holoview dataset object): index to genre mapping
+        thres (int): min number of co-occurences
+        colors (dict): colormap associated to genres
+        save (bool, optional): option to save the plot. Defaults to False.
+
+    Returns:
+        aggregated diagram object: all frames aggregated
+    """
+    dict_ = {}
+    for t in thres_list:
+        dict_[f'{t}'] = one_chord(links, nodes, t, colors)
+    hmap = hv.HoloMap(dict_, 'Min co-occurences').opts(fontsize={'title': 16})
+    hv.util.save(hmap, 'outputs/genre_chord_diag', fmt='html', resources='cdn', toolbar=True, title='Genre co-occurences')
+    return hmap
 
 ########################
 ###    Clustering    ###
