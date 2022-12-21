@@ -617,7 +617,6 @@ def multiple_chord(links, nodes, thres_list, colors, save = False):
         dict_[f'{t}'] = one_chord(links, nodes, t, colors)
     hmap = hv.HoloMap(dict_, 'Min co-occurences').opts(fontsize={'title': 16})
     hv.util.save(hmap, 'outputs/genre_chord_diag', fmt='html', resources='cdn', toolbar=True, title='Genre co-occurences')
-    plt.show('png')
 
 ########################
 ###    Clustering    ###
