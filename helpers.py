@@ -660,7 +660,7 @@ def four_radar_charts(data_R_B, whole_data, name_cat='', ran=[0, 0.55]) :
 
     fig.show('jupyterlab')
     
-def four_radar_charts_superposition(data_R_B, whole_data, name_cat='', ran=[0, 0.55]) :
+def four_radar_charts_superposition(data_R_B, whole_data, name_cat='', ran=[0, 0.55], save=False, filename='') :
     """ Plot 4 radar charts from the data_R_B, each subset being superimposed. We computed for each feature the fraction of
     of this feature with respect to the whole data set.
 
@@ -710,11 +710,14 @@ def four_radar_charts_superposition(data_R_B, whole_data, name_cat='', ran=[0, 0
           visible=True,
           range=ran
         )),
-        width=1300,
-        height=1000,
+        width=700,
+        height=500,
       showlegend=True,
         title_text = '{} representation in the subsets'.format(name_cat)
     )
+
+    if save:
+        fig.write_html(f"outputs/superposated_radar_charts_{filename}.html")
 
     fig.show('jupyterlab')
     
@@ -770,7 +773,7 @@ def compute_and_plot_CI_with_data_separation(data_1, data_vs, m_colors, data_1_n
         plot_double_CIs([CIs_old[i], CIs_old_vs[i]], [CIs_recent[i], CIs_recent_vs[i]], params= \
                         [data_1_name, data_vs_name], xlabel=actors_params[i], figsize=(5,2), m_colors=m_colors)
         
-def single_radar_chart(subset, whole_data, name_cat='') :   
+def single_radar_chart(subset, whole_data, name_cat='', save=False, filename='') :   
     """ Plot a single radar chart of the subset data. We computed for each feature the fraction of
     of this feature with respect to the whole data set.
 
@@ -798,6 +801,9 @@ def single_radar_chart(subset, whole_data, name_cat='') :
         title_text = '{} representation in the subset'.format(name_cat)
         #title_text = 'Number of the movies over the total number of movies in the {} categorie in the whole dataset'.format(name_cat)
     )
+
+    if save:
+        fig.write_html(f"outputs/single_radar_chart_{filename}.html")
 
     fig.show('jupyterlab')
     
