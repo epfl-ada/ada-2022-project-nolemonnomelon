@@ -29,22 +29,22 @@ All the details about the final dataset creation are available in the notebook [
 
 ## Methods
 
-**Step 1: Dataset construction and pre-processing.** [`dataset_creation.ipynb`](https://github.com/epfl-ada/ada-2022-project-nolemonnomelon/blob/main/dataset_creation.ipynb)
+**Step 1: Dataset construction and pre-processing.** [`M2_dataset_creation.ipynb`](https://github.com/epfl-ada/ada-2022-project-nolemonnomelon/blob/main/M2_dataset_creation.ipynb)
 
 * CMU exploration.
 * Final dataset creation.
 
-**Step 2: Preliminary analysis and visualizations.** [`Exploratory.ipynb`](https://github.com/epfl-ada/ada-2022-project-nolemonnomelon/blob/main/Exploratory.ipynb)
+**Step 2: Preliminary analysis and visualizations.** [`M3.1_rating_revenue_budget.ipynb`](https://github.com/epfl-ada/ada-2022-project-nolemonnomelon/blob/main/M3.1_rating_revenue_budget.ipynb)
 
 * Graphical representations of revenue, budget and rating.
 * Pearson correlation coefficient evaluation.
 
-**Step 3: Genre analysis.** [`Genre.ipynb`](https://github.com/epfl-ada/ada-2022-project-nolemonnomelon/blob/main/Genre.ipynb)
+**Step 3: Genre analysis.** [`M3.2_genres.ipynb`](https://github.com/epfl-ada/ada-2022-project-nolemonnomelon/blob/main/M3.2_genres.ipynb)
 
 * Graphical representations, correlation with revenue, budget and rating.
 * Regression with selected features.  
 
-**Step 4: PCA and clustering.** [`Clustering.ipynb`](https://github.com/epfl-ada/ada-2022-project-nolemonnomelon/blob/main/Clustering.ipynb)
+**Step 4: PCA and clustering.** [`M3.3_clustering.ipynb`](https://github.com/epfl-ada/ada-2022-project-nolemonnomelon/blob/main/M3.3_clustering.ipynb)
 
 * Find characteristics of low budget movies space.
 * Determine regions with low budget and high revenue.
